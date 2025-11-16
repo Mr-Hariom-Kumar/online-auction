@@ -1,18 +1,25 @@
+// server/src/index.js
+
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import { connectDB } from "./config/db.js";
 
+import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import auctionRoutes from "./routes/auctionRoutes.js";
 import bidRoutes from "./routes/bidRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-import cors from "cors";
 
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// --- CORS SETUP ---
 const allowedOrigins = [
-  "http://localhost:5173", // Vite dev
-  process.env.FRONTEND_URL // your deployed frontend (we’ll set env var on Render)
+  "http://localhost:5173",           // Vite dev
+  process.env.FRONTEND_URL || ""     // your deployed frontend (Render)
 ];
 
 app.use(
@@ -27,17 +34,11 @@ app.use(
   })
 );
 
-dotenv.config();
-
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-// middleware
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+// --- MIDDLEWARE ---
 app.use(express.json());
 app.use(morgan("dev"));
 
-// routes
+// --- ROUTES ---
 app.use("/api/auth", authRoutes);
 app.use("/api/auctions", auctionRoutes);
 app.use("/api/bids", bidRoutes);
@@ -47,6 +48,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Online Auction API running" });
 });
 
+// --- DB + SERVER START ---
 connectDB();
 
 app.listen(PORT, () => {
