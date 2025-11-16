@@ -8,6 +8,24 @@ import authRoutes from "./routes/authRoutes.js";
 import auctionRoutes from "./routes/auctionRoutes.js";
 import bidRoutes from "./routes/bidRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import cors from "cors";
+
+const allowedOrigins = [
+  "http://localhost:5173", // Vite dev
+  process.env.FRONTEND_URL // your deployed frontend (we’ll set env var on Render)
+];
+
+app.use(
+  cors({
+    origin(origin, cb) {
+      // allow tools like Postman (no origin)
+      if (!origin) return cb(null, true);
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(new Error("Not allowed by CORS"));
+    },
+    credentials: false
+  })
+);
 
 dotenv.config();
 
